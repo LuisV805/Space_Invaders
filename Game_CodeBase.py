@@ -1,64 +1,32 @@
+from Constants import *
 import pygame
 import os
+import sys
 import random
 import logging
 import functools
-from pathlib import Path
+
 
 pygame.init()
 
 '''-----------------------------------------------------------------------------
-    COLORS '''
-
-WHITE =             (255, 255, 255)
-BLACK =             (  0,   0,   0)
-RED =               (255,   0,   0)
-GREEN =             (  0, 255,   0)
-BLUE =              (  0,   0, 255)
-YELLOW =            (255, 255,   0)
-PURPLE =            (  0, 255, 255)
-
-STEEL_BLUE =        ( 70, 130, 180)
-
-'''-----------------------------------------------------------------------------
-    CONSTANTS'''
-
-CURRENT_DIR = Path.cwd()
-
-WIDTH =             800
-HEIGHT =            800
-FPS =               60
-
-GAME_FONT =         "comicsans"
-GAME_FONT_SIZE =    50
-TEXT_BOX_COLOR =    (20,  20,  20)
-MENU_PADDING =      5
-
-'''-----------------------------------------------------------------------------
-    LOGGING '''
-
-LOGGING_FORMAT =        '%(asctime)s %(message)s'
-LOGGING_DATE_FORMAT =   '%m/%d/%Y %I:%M:%S %p'
-LOGGING_LEVEL =         logging.DEBUG
-LOG_EVENTS =            False
-LOG_OBJECTS =           False
-LOG_COLLISIONS =        True
+    GAME LOG '''
 
 logging.basicConfig(    format=LOGGING_FORMAT,
                         datefmt=LOGGING_DATE_FORMAT,
-                        level=LOGGING_LEVEL)
+                        level=logging.DEBUG)
 
 def log_event(event, obj):
     if event == "State":             logging.info(f"Game State Change:    {str(obj)}")
     if event == "Loop":              logging.info(f"Current Loop:         {str(obj)}")
     if event == "Menu Selection":    logging.info(f"Menu Selection:       {str(obj)}")
     if LOG_EVENTS:
-        if event == "Event":             logging.info(f"Event:                {str(obj)}")
+        if event == "Event":         logging.info(f"Event:                {str(obj)}")
     if LOG_OBJECTS:
-        if event == "Obj Created":       logging.info(f"Obj Created:          {str(obj)}")
-        if event == "Obj Removed":       logging.info(f"Obj Removed:          {str(obj)}")
+        if event == "Obj Created":   logging.info(f"Obj Created:          {str(obj)}")
+        if event == "Obj Removed":   logging.info(f"Obj Removed:          {str(obj)}")
     if LOG_COLLISIONS:
-        if event == "Collision":         logging.info(f"Collision:            {str(obj)}")
+        if event == "Collision":     logging.info(f"Collision:            {str(obj)}")
 
 '''-----------------------------------------------------------------------------
     BASIC OBJECTS '''
@@ -156,6 +124,7 @@ class Img:
             self.file =    pygame.image.load(img_filename)
         except FileNotFoundError:
             logging.error(f"File not found: \t\t {img_filename}")
+            pygame.quit()
             quit()
         finally:
             self.get_mask()
@@ -406,11 +375,38 @@ class Menu:
     # MISCELLANEOUS
 
     def add_menu_option(self, text, func, *args, **kwargs):
-        self.options.append(Menu_Option(    self.game,
-                                            self,
-                                            text,
-                                            func,
-                                            args, kwargs))
+        # self.options.append(Menu_Option(    self.game,
+        #                                     self,
+        #                                     text,
+        #                                     func,
+        #                                     args, kwargs))
+
+        if   len(args) != 0 and len(kwargs) != 0:
+            self.options.append(Menu_Option(    self.game,
+                                                self,
+                                                text,
+                                                func,
+                                                args, kwargs))
+        elif len(args) != 0 and len(kwargs) == 0:
+            if len(args) == 1:
+                self.options.append(Menu_Option(    self.game,
+                                                    self,
+                                                    text,
+                                                    func,
+                                                    args[0]))
+            else:
+                self.options.append(Menu_Option(    self.game,
+                                                    self,
+                                                    text,
+                                                    func,
+                                                    args))
+        elif len(args) == 0 and len(kwargs) != 0:
+            self.options.append(Menu_Option(    self.game,
+                                                self,
+                                                text,
+                                                func,
+                                                kwargs))
+
 
     def current_option(self):
         return self.options[self.current_selection]
@@ -432,6 +428,8 @@ class Menu_Option(Text_obj):
         self.w =            self.obj.get_width()
         self.h =            self.obj.get_height()
 
+    # --------------------------------------------------------------------------
+
     def call_func(self):
         def func_to_call():
             if   len(self.args) != 0 and len(self.kwargs) != 0:
@@ -445,55 +443,6 @@ class Menu_Option(Text_obj):
                 self.func(self.kwargs)
 
         return func_to_call()
-
-    # --------------------------------------------------------------------------
-
-'''-----------------------------------------------------------------------------
-    BASE MENUS '''
-
-class Basic_Start_Menu(Menu):
-    def __init__(self, game):
-        super().__init__(game)
-        self.options = []
-        self.set_menu_options()
-        self.set_geometry()
-
-    def __str__(self):
-        return str(type(self))
-
-    def set_menu_options(self):
-        self.options.append(Menu_Option(    self.game,
-                                            self,
-                                            "Start Game",
-                                            self.game.set_state,
-                                            "Play"))
-
-        self.options.append(Menu_Option(    self.game,
-                                            self,
-                                            "Exit Game",
-                                            self.game.set_state,
-                                            "Exit"))
-
-    # --------------------------------------------------------------------------
-
-class Basic_Pause_Menu(Menu):
-    def __init__(self, game):
-        super().__init__(game)
-        self.options = []
-        self.set_menu_options()
-        self.set_geometry()
-
-    def __str__(self):
-        return str(type(self))
-
-    def set_menu_options(self):
-        self.add_menu_option(   "Resume Game",
-                                self.game.set_state,
-                                "Play")
-
-        self.add_menu_option(   "Exit Game",
-                                self.game.set_state,
-                                "Exit")
 
     # --------------------------------------------------------------------------
 
