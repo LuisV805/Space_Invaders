@@ -38,6 +38,7 @@ class Py_Game:
         self.fps =                  fps
 
         self.font =                 pygame.font.SysFont(GAME_FONT, GAME_FONT_SIZE)
+        self.font_color =           GAME_FONT_COLOR
         self.clock =                pygame.time.Clock()
         self.display =              pygame.Surface((self.w, self.h))
         self.screen =               pygame.display.set_mode((self.w, self.h))
@@ -48,6 +49,9 @@ class Py_Game:
 
         self.objects =              []
         self.background =           None
+
+        self.game_over_timer =      100
+        self.game_over_text =       Text_obj(self, "Game Over")
 
     def __str__(self):
         return str(type(self))
@@ -97,11 +101,21 @@ class Py_Game:
 
     def main_loop(self):
         log_event("Loop", self)
+        self.running = True
         while self.running:
             self.check_state()
             self.screen_update()
 
-    # --------------------------------------------------------------------------
+    def game_over(self):
+        x = (self.w - self.game_over_text.w)/2
+        y = (self.h - self.game_over_text.h)/2
+        while self.game_over_timer != 0:
+            self.screen.blit(self.game_over_text.obj, (x, y))
+            self.game_over_timer -= 1
+            self.screen_update()
+        self.running = False
+
+'''-----------------------------------------------------------------------------'''
 
 class Img:
     def __init__(self, img_filename, scale = None):
@@ -135,7 +149,7 @@ class Img:
         self.file =         pygame.transform.scale(self.file, (new_width, new_height))
         self.mask =         self.get_mask()
 
-    # --------------------------------------------------------------------------
+'''-----------------------------------------------------------------------------'''
 
 class Drawable_Object:
     def __init__(self, game):
@@ -229,7 +243,7 @@ class Drawable_Object:
                         self.collided = True
                         other_obj.collided = True
 
-    # --------------------------------------------------------------------------
+'''-----------------------------------------------------------------------------'''
 
 class Text_obj:
     def __init__(self, game, text):
@@ -366,6 +380,7 @@ class Menu:
     def main_loop(self):
         log_event("Loop", self)
         self.set_geometry()
+        self.running = True
         while self.running == True:
             self.game.check_events_for_quit()
             self.draw()
@@ -411,7 +426,7 @@ class Menu:
     def current_option(self):
         return self.options[self.current_selection]
 
-    # --------------------------------------------------------------------------
+'''-----------------------------------------------------------------------------'''
 
 class Menu_Option(Text_obj):
     def __init__(self, game, menu, text, func, *args, **kwargs):
@@ -444,7 +459,4 @@ class Menu_Option(Text_obj):
 
         return func_to_call()
 
-    # --------------------------------------------------------------------------
-
-'''-----------------------------------------------------------------------------
-'''
+'''-----------------------------------------------------------------------------'''

@@ -1,7 +1,6 @@
 from Game_CodeBase import *
 
-'''-----------------------------------------------------------------------------
-    GAME OBJECTS '''
+'''-----------------------------------------------------------------------------'''
 
 class Avatar(Drawable_Object):
     def __init__(self, game):
@@ -31,7 +30,7 @@ class Avatar(Drawable_Object):
                 self.timer_laser_cooldown = 10
         else: self.timer_laser_cooldown -= 1
 
-    # --------------------------------------------------------------------------
+'''-----------------------------------------------------------------------------'''
 
 class Enemy(Avatar):
     def __init__(self, game):
@@ -78,7 +77,7 @@ class Enemy(Avatar):
         self.game.objects.remove(self)
         self.game.log_obj_counts(self)
 
-    # --------------------------------------------------------------------------
+'''-----------------------------------------------------------------------------'''
 
 class Player(Avatar):
     def __init__(self, game):
@@ -118,7 +117,7 @@ class Player(Avatar):
         if self.lives == 0:
             self.game.set_state("Game Over")
 
-    # --------------------------------------------------------------------------
+'''-----------------------------------------------------------------------------'''
 
 class Laser(Drawable_Object):
     def __init__(self, game, parent):
@@ -160,4 +159,4 @@ class Laser(Drawable_Object):
             if self.parent_avatar == self.game.session.player_1:
                 self.game.session.player_1.score += 10
 
-    # --------------------------------------------------------------------------
+'''-----------------------------------------------------------------------------'''

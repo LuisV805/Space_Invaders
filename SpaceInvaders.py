@@ -88,7 +88,7 @@ class Game:
             self.draw_labels()
             self.game.screen_update()
 
-    # --------------------------------------------------------------------------
+'''-----------------------------------------------------------------------------'''
 
 class Start_Menu(Menu):
     def __init__(self, game):
@@ -111,7 +111,7 @@ class Start_Menu(Menu):
                                 self.game.set_state,
                                 "Exit")
 
-    # --------------------------------------------------------------------------
+'''-----------------------------------------------------------------------------'''
 
 class Pause_Menu(Menu):
     def __init__(self, game):
@@ -170,7 +170,7 @@ class Program(Py_Game):
             elif self.get_state() == "Play":        self.session.main_loop()
             elif self.get_state() == "Pause":       self.pause_menu.main_loop()
             elif self.get_state() == "Exit":        pygame.quit()
-            elif self.get_state() == "Game Over":   self.running = False
+            elif self.get_state() == "Game Over":   self.game_over()
 
     def log_obj_counts(self, obj):
         if LOG_OBJECTS:
@@ -179,13 +179,10 @@ class Program(Py_Game):
             count_lasers = count_objects - count_enemies
             logging.debug(f"Game Objects: 	     {count_objects} \t\t {count_enemies} \t\t {count_lasers}".replace("\t0","\t "))
 
-    # --------------------------------------------------------------------------
-
 '''-----------------------------------------------------------------------------
     MAIN LOOP'''
 
 if __name__ == "__main__":
-    pygame.init()
     playing = True
     while playing:
         g = Program(WIDTH, HEIGHT, FPS)
